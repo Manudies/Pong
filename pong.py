@@ -1,24 +1,36 @@
 import pygame
 
-pygame.init()
-pantalla = pygame.display.set_mode((800, 600))
 
-salir = False
-while not salir:
-    # bucle principal (o main loop)
-
-    for evento in pygame.event.get():
-        print('Se ha producido un evento de tipo', evento.type)
-        if evento.type == pygame.QUIT:
-            print('Se ha cerrado la ventana')
-            salir = True
+ANCHO = 800
+ALTO = 600
 
 
-    # renderizar nuestros objetos
-    rectangulo = pygame.Rect(50, 100, 300, 150)
-    pygame.draw.rect(pantalla, (94, 68, 158), rectangulo)
+class Pong:
+    def __init__(self) -> None:
+        pygame.init()
+        self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
+        
+    def jugar(self):    # contiene el bucle principal
+        salir = False
+        while not salir:
+            # bucle principal (o main loop)
 
-    # mostrar los cambios en la pantalla
-    pygame.display.flip()
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    salir = True
 
-pygame.quit()
+
+            # renderizar nuestros objetos
+
+            # mostrar los cambios en la pantalla
+            pygame.display.flip()
+
+        pygame.quit()
+
+if __name__ == '__main__':
+    print('Has llamado a pong.py directamente desde la línea de comandos')
+    juego = Pong()
+    juego.jugar()
+else:
+    print('Has llamado a pong.py desde una sentencia import')
+    print('El nombre del paquete ahora es', __name__)
