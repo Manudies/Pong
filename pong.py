@@ -95,35 +95,39 @@ class Pong:
                 if evento.type == pygame.QUIT:
                     salir = True
 
-            estado_teclas = pygame.key.get_pressed()
-            if estado_teclas[pygame.K_q]:
-                self.jugador1.mover(ARRIBA)
-            if estado_teclas[pygame.K_a]:
-                self.jugador1.mover(ABAJO)
-            if estado_teclas[pygame.K_UP]:
-                self.jugador2.mover(ARRIBA)
-            if estado_teclas[pygame.K_DOWN]:
-                self.jugador2.mover(ABAJO)
+            self.comprobar_teclas()
 
             # BLoque 2 Renderizar nuestros objetos
             # PANTALLA
-            pygame.draw.rect(self.pantalla, C_FONDO, ((0, 0), (ANCHO, ALTO)))
+            self.pantalla.fill(C_FONDO)
+            # pygame.draw.rect(self.pantalla, C_FONDO, ((0, 0), (ANCHO, ALTO)))
 
             self.pintar_red()
             self.jugador1.pintame(self.pantalla)
             self.jugador2.pintame(self.pantalla)
 
-            self.pelota.mover()
-            self.pelota.pintame(self.pantalla)
-
-            # pintar red
-
-            # pintar marcador
+            self.pintar_pelota()
 
             # mostrar los cambios en la pantalla
             pygame.display.flip()
             self.reloj.tick(FPS)
         pygame.quit()
+
+    def comprobar_teclas(self):
+        estado_teclas = pygame.key.get_pressed()
+        if estado_teclas[pygame.K_q]:
+            self.jugador1.mover(ARRIBA)
+        if estado_teclas[pygame.K_a]:
+            self.jugador1.mover(ABAJO)
+        if estado_teclas[pygame.K_UP]:
+            self.jugador2.mover(ARRIBA)
+        if estado_teclas[pygame.K_DOWN]:
+            self.jugador2.mover(ABAJO)
+
+    def pintar_pelota(self):
+        self.pelota.mover()
+
+        self.pelota.pintame(self.pantalla)
 
     def pintar_red(self):
         tramo_pintado = 30
