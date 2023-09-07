@@ -21,6 +21,7 @@ ABAJO = False
 
 FPS = 35
 TAM_LETRA = 100
+PUNTUACIÓN_MAX = 3
 
 
 class Pelota(pygame.Rect):
@@ -114,8 +115,11 @@ class Marcador:
             i += 2
 
     def comprobar_ganador(self):
-        pass
-
+        if self.puntos[0] == PUNTUACIÓN_MAX:
+            return 1
+        if self.puntos[1] == PUNTUACIÓN_MAX:
+            return 2
+        return 0
         """
     NEcesita:
     - Atributo Guardar la puntuación J1
@@ -138,6 +142,7 @@ class Pong:
         self.jugador1 = Jugador(MARGEN, (ALTO-ALTO_PALA)/2)
         self.jugador2 = Jugador(ANCHO - MARGEN, (ALTO-ALTO_PALA)/2)
         self.marcador = Marcador()
+        self.tipografia = pygame.font.SysFont('candara', 50)
 
     def jugar(self):
         # contiene el bucle principal
@@ -151,8 +156,6 @@ class Pong:
                 if evento.type == pygame.QUIT or (evento.type == pygame.KEYUP and evento.key == pygame.K_ESCAPE):
                     salir = True
 
-            self.comprobar_teclas()
-
             # BLoque 2 Renderizar nuestros objetos
             self.pantalla.fill(C_FONDO)
             # pygame.draw.rect(self.pantalla, C_FONDO, ((0, 0), (ANCHO, ALTO)))
@@ -161,11 +164,17 @@ class Pong:
             self.jugador1.pintame(self.pantalla)
             self.jugador2.pintame(self.pantalla)
 
-            self.pintar_pelota()
-            hay_punto = self.pelota.comprobar_punto()
-            if hay_punto > 0:
-                self.marcador.incrementar(hay_punto)
-                hay_ganador = self.marcador.comprobar_ganador()
+            hay_ganador = self.marcador.comprobar_ganador()
+            if hay_ganador > 0:
+
+                salir = self.finalizar_partida(hay_ganador)
+
+            else:
+                self.comprobar_teclas()
+                self.pintar_pelota()
+                hay_punto = self.pelota.comprobar_punto()  # 0, 1, 2
+                if hay_punto > 0:
+                    self.marcador.incrementar(hay_punto)
 
             self.marcador.pintame(self.pantalla)
 
@@ -173,6 +182,26 @@ class Pong:
             pygame.display.flip()
             self.reloj.tick(FPS)
         pygame.quit()
+
+    def finalizar_partida(self, hay_ganador):
+        mensaje = f'Ha ganado el jugador {hay_ganador}'
+        texto_img = self.tipografia.render(mensaje, False, C_OBJETOS)
+        x = ANCHO / 2 - texto_img.get_width() / 2
+        y = ALTO / 2 - texto_img.get_height() / 2
+        self.pantalla.blit(texto_img, (x, y))
+
+        mensaje = f'¿Jugamos otra? S/N'
+        texto_img = self.tipografia.render(mensaje, False, C_OBJETOS)
+        x = ANCHO / 2 - texto_img.get_width() / 2
+        y = ALTO / 3 - texto_img.get_height()
+        self.pantalla.blit(texto_img, (x, y))
+
+        estado_teclas = pygame.key.get_pressed()
+        if estado_teclas[pygame.K_s]:
+            self.marcador.reset()
+            return False
+        if estado_teclas[pygame.K_n]:
+            return True
 
     def comprobar_teclas(self):
         estado_teclas = pygame.key.get_pressed()
