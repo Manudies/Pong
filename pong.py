@@ -1,26 +1,26 @@
-# from typing import Any
 from random import randint
 import pygame
 
 ANCHO = 1280
 ALTO = 720
+FPS = 45
+TAM_LETRA = 100
 
 C_OBJETOS = (255, 255, 255)
 C_FONDO = (100, 100, 100)
 
 ANCHO_PALA = 10
 ALTO_PALA = 50
-MARGEN = 20
-TAM_PELOTA = 10
-
-VEL_MAX = 10
 VEL_JUGADOR = 5
-
 ARRIBA = True
 ABAJO = False
 
-FPS = 35
-TAM_LETRA = 100
+MARGEN = 20
+TAM_PELOTA = 10
+VEL_MAX = 12
+VARIACION_VEL_PELOTA = 5
+
+TAM_LETRA_MARCADOR = 150
 PUNTUACIÓN_MAX = 3
 
 
@@ -39,7 +39,6 @@ class Pelota(pygame.Rect):
     def mover(self):
         self.x = self.x + self.velocidad_x
         self.y = self.y + self.velocidad_y
-
         if self.y <= 0:
             self.y = 0
             self.velocidad_y = -self.velocidad_y
@@ -48,8 +47,6 @@ class Pelota(pygame.Rect):
             self.velocidad_y = -self.velocidad_y
 
     def comprobar_punto(self):
-        # Comprobar si la pelota ha salido por los laterales
-
         # Si sale por la izquierda suma a jugador 2
         if self.right <= 0:
             print("Punto para J2")
@@ -99,12 +96,6 @@ class Marcador:
         self.puntos = [0, 0]
 
     def pintame(self, pantalla):
-
-        # puntuacion = str(self.puntos[0])
-        # texto = self.tipografia.render(puntuacion, True, C_OBJETOS)
-        # pos_x = ANCHO/4
-        # pos_y = MARGEN
-        # pantalla.blit(texto, (pos_x, pos_y))
         i = 1
         for punto in self.puntos:
             puntuacion = str(punto)
@@ -120,12 +111,6 @@ class Marcador:
         if self.puntos[1] == PUNTUACIÓN_MAX:
             return 2
         return 0
-        """
-    NEcesita:
-    - Atributo Guardar la puntuación J1
-    - Atributo Guardar la puntuación J2
-    - Metodo ponerse a cero
-    - Metodo mostrarse en pantalla"""
 
 
 class Pong:
@@ -136,9 +121,7 @@ class Pong:
         # self.cargar_icono = pygame.image.load("icono.png")
         # self.icono = pygame.display.set_icon(self.cargar_icono)
         self.reloj = pygame.time.Clock()
-
         self.pelota = Pelota()
-
         self.jugador1 = Jugador(MARGEN, (ALTO-ALTO_PALA)/2)
         self.jugador2 = Jugador(ANCHO - MARGEN, (ALTO-ALTO_PALA)/2)
         self.marcador = Marcador()
@@ -160,15 +143,12 @@ class Pong:
             self.pantalla.fill(C_FONDO)
             # pygame.draw.rect(self.pantalla, C_FONDO, ((0, 0), (ANCHO, ALTO)))
             self.pintar_red()
-
             self.jugador1.pintame(self.pantalla)
             self.jugador2.pintame(self.pantalla)
 
             hay_ganador = self.marcador.comprobar_ganador()
             if hay_ganador > 0:
-
                 salir = self.finalizar_partida(hay_ganador)
-
             else:
                 self.comprobar_teclas()
                 self.pintar_pelota()
@@ -216,8 +196,12 @@ class Pong:
 
     def pintar_pelota(self):
         self.pelota.mover()
-        if self.pelota.colliderect(self.jugador1) or self.pelota.colliderect(self.jugador2):
-            self.pelota.velocidad_x = -self.pelota.velocidad_x
+        if self.pelota.colliderect(self.jugador1):
+            self.pelota.velocidad_x = randint(1, VEL_MAX)
+            self.pelota.velocidad_y = randint(-VEL_MAX, VEL_MAX)
+        if self.pelota.colliderect(self.jugador2):
+            self.pelota.velocidad_x = randint(-VEL_MAX, -1)
+            self.pelota.velocidad_y = randint(-VEL_MAX, VEL_MAX)
         self.pelota.pintame(self.pantalla)
 
     def pintar_red(self):
